@@ -49,14 +49,14 @@
     <select id="list" resultType="com.sky.entity.Dish">
         select * from dish
         <where>
-            <if test="status != NULL ">
+            <if test="status != null ">
                 and status = #{status}
             </if>
-            <if test="categoryId != NULL">
+            <if test="categoryId != null">
                 and category_id = #{categoryId}
             </if>
-            <if test="name != NULL">
-                and name like concat ('%','#{name}','%')
+            <if test="name != null">
+                and name like concat ('%',#{name},'%')
             </if>
         </where>
     </select>

@@ -6,8 +6,15 @@ sky:
     database: sky_take_out
     username: root
     password: Ab20041106
+
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: ${ALI_ACCESS_KEY_ID}
     access-key-secret: ${ALI_ACCESS_KEY_SECRET}
     bucket-name: its-mygo
+
+  redis:
+    host: 192.168.222.128
+    port: 6379
+    password: Ab20041106
+    database: 10

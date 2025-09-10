@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.SetmealVO;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -21,6 +23,7 @@ public interface SetmealMapper {
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
     Integer countByCategoryId(Long id);
 
+    @AutoFill(OperationType.INSERT)
     @Insert("INSERT INTO setmeal " +
             "(category_id, name, price, description, image, status, create_time, update_time, create_user, update_user) " +
             "VALUES " +
@@ -28,7 +31,7 @@ public interface SetmealMapper {
             "#{createTime}, #{updateTime}, #{createUser}, #{updateUser})")
     void addSetMeal(Setmeal setmeal);
 
-    Page<Setmeal> page();
+    Page<SetmealVO> page(Integer categoryId , Integer status , String name);
 
     List<Setmeal> getByIds(List<Long> ids);
 
@@ -38,5 +41,5 @@ public interface SetmealMapper {
     Setmeal getSetmealById(Long id);
 
     @AutoFill(OperationType.UPDATE)
-    void updateSetMeal(Setmeal setmeal);
+    void updateSetmeal(Setmeal setmeal);
 }

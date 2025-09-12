@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Insert;
@@ -42,4 +43,8 @@ public interface SetmealMapper {
 
     @AutoFill(OperationType.UPDATE)
     void updateSetmeal(Setmeal setmeal);
+
+    List<Setmeal> getSetmealByCategoryId(Long categoryId);
+
+    List<DishItemVO> getDishItemBySetmealId(Long id);
 }

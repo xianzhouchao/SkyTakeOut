@@ -18,11 +18,13 @@ import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -35,6 +37,9 @@ public class DishServiceImpl implements DishService {
     private SetmealMapper setmealMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Transactional
     @Override
@@ -55,6 +60,9 @@ public class DishServiceImpl implements DishService {
             //向口味表插入n条数据
             dishFlavorMapper.insertBatch(flavors);//后绪步骤实现
         }
+
+        String pattern = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(pattern);
 
 
     }
@@ -91,6 +99,10 @@ public class DishServiceImpl implements DishService {
         dishMapper.deleteBatch(afterFilter);
 
         dishFlavorMapper.deleteBatch(afterFilter);
+
+        String pattern = "dish_*" ;
+
+        redisTemplate.delete(pattern);
     }
 
     @Override
@@ -112,8 +124,11 @@ public class DishServiceImpl implements DishService {
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
 
-        List<Long> list = List.of(dishDTO.getId()) ;
+        Long id = dishDTO.getId();
+
+        List<Long> list = List.of(id) ;
         dishFlavorMapper.deleteBatch(list);
+
 
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -122,7 +137,7 @@ public class DishServiceImpl implements DishService {
 
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
 
-        dishFlavorMapper.insertBatch(dishFlavors);
+
         if (dishFlavors != null && dishFlavors.size() > 0) {
             dishFlavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishDTO.getId());
@@ -130,6 +145,10 @@ public class DishServiceImpl implements DishService {
             //向口味表插入n条数据
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+
+        String pattern  = "dish_" + dishDTO.getCategoryId();
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
 
     }
 
@@ -156,5 +175,13 @@ public class DishServiceImpl implements DishService {
             if (dishVo.getStatus() == 1 ) dishVOList.add(dishVo);
         });
         return dishVOList;
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = new Dish();
+        dish.setStatus(status);
+        dish.setId(id);
+        dishMapper.update(dish);
     }
 }

@@ -12,6 +12,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,9 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
+    @Qualifier("redisTemplate")
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 新增菜品
@@ -79,4 +84,16 @@ public class DishController {
         return Result.success(dishs);
     }
 
+    @PostMapping("/status/{status}")
+    @ApiOperation("菜品起售停售")
+    public Result<String> startOrStop(@PathVariable Integer status, Long id) {
+        dishService.startOrStop(status, id);
+
+        //将所有的菜品缓存数据清理掉，所有以dish_开头的key
+       String pattern = "dish_*" ;
+
+       redisTemplate.delete(pattern);
+
+       return Result.success();
+    }
 }

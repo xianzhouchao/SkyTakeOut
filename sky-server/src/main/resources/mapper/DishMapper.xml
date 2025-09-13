@@ -9,7 +9,7 @@
     </insert>
 
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
-        select d.* , c.name from dish d left join category c on d.category_id = c.id
+        select d.* , c.name categoryName from dish d left join category c on d.category_id = c.id
         <where>
             <if test="status != null">
                and d.status = #{status}

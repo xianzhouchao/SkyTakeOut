@@ -1,6 +1,8 @@
 package com.sky.controller.user;
 
 import com.sky.dto.UserLoginDTO;
+import com.sky.entity.User;
+import com.sky.mapper.UserMapper;
 import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
 import com.sky.service.UserService;
@@ -9,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +28,9 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @PostMapping("/login")
     @ApiOperation("微信登录")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
@@ -37,5 +43,13 @@ public class UserController {
         return Result.success(userLoginVO);
 
 
+    }
+
+
+    @PostMapping
+    @CachePut(value = "userCache", key = "#user.id")//key的生成：userCache::1
+    public User save(@RequestBody User user){
+        userMapper.insertUser(user);
+        return user;
     }
 }
